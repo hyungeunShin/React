@@ -70,8 +70,8 @@ module.exports = {
   appTsBuildInfoFile: resolveApp('node_modules/.cache/tsconfig.tsbuildinfo'),
   swSrc: resolveModule(resolveApp, 'src/service-worker'),
   publicUrlOrPath,
+  ssrIndexJs: resolveApp('src/index.server.js'),
+  ssrBuild: resolveApp('dist')
 };
-
-
 
 module.exports.moduleFileExtensions = moduleFileExtensions;
