@@ -11,31 +11,35 @@ import rootReducer, { rootSaga } from './modules';
 import PreloadContext from './lib/PreloadContext';
 import createSagaMiddleware from 'redux-saga';
 import { END } from 'redux-saga'; 
+import { ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
+
+const statsFile = path.resolve('./build/loadable-stats.json');
 
 //asset-manifest.json에서 파일 경로 조회
 const manifest = JSON.parse(
     fs.readFileSync(path.resolve('./build/asset-manifest.json'), 'utf-8')
 );
 
-function createPage(root, stateScript) {
-    return `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="utf-8" />
-      <link rel="shortcut icon" href="/favicon.ico" />
-      <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"/>
-      <meta name="theme-color" content="#000000" />
-      <title>React App</title>
-      <link href="${manifest.files['main.css']}" rel="stylesheet">
-    </head>
-    <body>
-      <noscript>You need to enable JavaScript to run this app.</noscript>
-      <div id="root">${root}</div>
-      ${stateScript}
-      <script src="${manifest.files['main.js']}"></script>
-    </body>
-    </html>
-      `;
+function createPage(root, tags) {
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8" />
+                <link rel="shortcut icon" href="/favicon.ico" />
+                <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"/>
+                <meta name="theme-color" content="#000000" />
+                <title>React App</title>
+                ${tags.styles}
+                ${tags.links}
+            </head>
+            <body>
+                <noscript>You need to enable JavaScript to run this app.</noscript>
+                <div id="root">${root}</div>
+                ${tags.scripts}
+            </body>
+        </html>
+    `;
   }
 
 const app = express();
@@ -59,14 +63,18 @@ const serverRender = async (req, res, next) => {
         promises: []
     };
 
+    const extractor = new ChunkExtractor({ statsFile });
+
     const jsx = (
-        <PreloadContext.Provider value={preloadContext}>
-            <Provider store={store}>
-                <StaticRouter location={req.url} context={context}>
-                    <App />
-                </StaticRouter>
-            </Provider>
-        </PreloadContext.Provider>
+        <ChunkExtractorManager extractor={extractor}>
+            <PreloadContext.Provider value={preloadContext}>
+                <Provider store={store}>
+                    <StaticRouter location={req.url} context={context}>
+                        <App />
+                    </StaticRouter>
+                </Provider>
+            </PreloadContext.Provider>
+        </ChunkExtractorManager>
     );
     
     ReactDOMServer.renderToStaticMarkup(jsx);   //renderToStaticMarkup으로 한번 렌더링 하고
@@ -85,7 +93,14 @@ const serverRender = async (req, res, next) => {
     const stateString = JSON.stringify(store.getState()).replace(/</g, '\\u003c');  //악성 스크립트 방지하기 위해 <를 치환
     const stateScript = `<script>__PRELOADED_STATE__ = ${stateString}</script>`;    // 리덕스 초기 상태를 스크립트로 주입
 
-    res.send(createPage(root, stateScript)); //결과물 응답
+    //미리 불러야 하는 스타일/스크립트 추출
+    const tags = {
+        scripts: stateScript + extractor.getScriptTags(),
+        links: extractor.getLinkTags(),
+        styles: extractor.getStyleTags(),
+    };
+
+    res.send(createPage(root, tags)); //결과물 응답
 };
 
 const serve = express.static(path.resolve('./build'), {
