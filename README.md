@@ -42,3 +42,5 @@ Chapter20. 서버 사이드 렌더링
 Chapter21. 백엔드 프로그래밍: Node.js의 Koa 프레임워크
 
 Chapter22. mongoose를 이용한 MongoDB 연동 실습
+
+Chapter23. JWT를 통한 회원 인증 시스템 구현하기
