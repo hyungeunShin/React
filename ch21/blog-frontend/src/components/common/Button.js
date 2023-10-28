@@ -1,7 +1,9 @@
 import styled, { css } from 'styled-components';
 import palette from '../../lib/styles/palette';
+import { Link } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 
-const StyledButton = styled.button`
+const buttonStyle = css`
     border: none;
     border-radius: 4px;
     font-size: 1rem;
@@ -31,6 +33,32 @@ const StyledButton = styled.button`
     `}
 `;
 
-const Button = props => <StyledButton {...props} />;
+const StyledButton = styled.button`
+    ${buttonStyle}
+`;
+
+const StyledLink = styled(Link)`
+    ${buttonStyle}
+`;
+
+const Button = props => {
+    return props.to ? (<StyledLink {...props} cyan={props.cyan ? 1 : 0} />) : (<StyledButton {...props} />);
+};
+
+// const Button = ({ to, ...rest }) => {
+//     const navigate = useNavigate();
+//     const onClick = (e) => {
+//         //to가 있다면 to로 페이지 이동
+//         if(to) {
+//             navigate(to);
+//         }
+
+//         if(rest.onClick) {
+//             rest.onClick(e);
+//         }
+//     };
+
+//     return <StyledButton {...rest} onClick={onClick} />;
+// };
 
 export default Button;
