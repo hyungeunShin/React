@@ -89,7 +89,7 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
                     />
                 )}
                 {error && <ErrorMessage>{error}</ErrorMessage>}
-                <ButtonWithMarginTop cyan fullWidth style={{ marginTop: '1rem' }}>{text}</ButtonWithMarginTop>
+                <ButtonWithMarginTop cyan style={{ marginTop: '1rem', width: '100%' }}>{text}</ButtonWithMarginTop>
             </form>
             <Footer>
                 {type === 'login' ? (<Link to="/register">회원가입</Link>) : (<Link to="/login">로그인</Link>)}
