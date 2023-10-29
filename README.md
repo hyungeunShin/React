@@ -46,3 +46,5 @@ Chapter22. mongoose를 이용한 MongoDB 연동 실습
 Chapter23. JWT를 통한 회원 인증 시스템 구현하기
 
 Chapter24. 프론트엔드 프로젝트: 시작 및 회원 인증 구현
+
+Chapter25. 프론트엔드 프로젝트: 글쓰기 기능 구현
