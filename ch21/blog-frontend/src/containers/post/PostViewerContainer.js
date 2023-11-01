@@ -9,6 +9,8 @@ const PostViewerContainer = () => {
     const { postId } = useParams();
     const dispatch = useDispatch();
 
+    console.log("111 ", postId);
+
     const { post, error, loading } = useSelector(({ post, loading }) => ({
         post: post.post,
         error: post.error,
