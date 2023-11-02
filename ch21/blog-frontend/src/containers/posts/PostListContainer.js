@@ -9,8 +9,6 @@ const PostListContainer = () => {
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
 
-    console.log("555", username);
-
     const { posts, error, loading, user } = useSelector(
         ({ posts, loading, user }) => ({
             posts: posts.posts,

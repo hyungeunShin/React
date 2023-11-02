@@ -57,11 +57,19 @@ const Editor = ({ title, body, onChangeField }) => {
         //https://quilljs.com/docs/api/#events 참고
         const quill = quillInstance.current;
         quill.on('text-change', (delta, oldDelta, source) => {
-            if (source === 'user') {
+            if(source === 'user') {
                 onChangeField({ key: 'body', value: quill.root.innerHTML });
             }
         });
     }, [onChangeField]);
+
+    const mounted = useRef(false);
+    useEffect(() => {
+        if(mounted.current) return;
+
+        mounted.current = true;
+        quillInstance.current.root.innerHTML = body;
+    }, [body]);
 
     const onChangeTitle = e => {
         onChangeField({ key: 'title', value: e.target.value });

@@ -10,6 +10,8 @@ const CHANGE_FIELD = 'write/CHANGE_FIELD';
 //포스트 작성
 const [WRITE_POST, WRITE_POST_SUCCESS, WRITE_POST_FAILURE] = createRequestActionTypes('write/WRITE_POST'); 
 
+const SET_ORIGINAL_POST = 'write/SET_ORIGINAL_POST';
+
 export const initialize = createAction(INITIALIZE);
 
 export const changeField = createAction(CHANGE_FIELD, ({ key, value }) => ({
@@ -22,7 +24,9 @@ export const writePost = createAction(WRITE_POST, ({ title, body, tags }) => ({
     body,
     tags,
 }));
-  
+
+export const setOriginalPost = createAction(SET_ORIGINAL_POST, post => post);
+
 //saga 생성
 const writePostSaga = createRequestSaga(WRITE_POST, postsAPI.writePost);
 export function* writeSaga() {
@@ -35,6 +39,7 @@ const initialState = {
     tags: [],
     post: null,
     postError: null,
+    originalPostId: null,
 };
   
 const write = handleActions(
@@ -60,6 +65,13 @@ const write = handleActions(
         [WRITE_POST_FAILURE]: (state, { payload: postError }) => ({
             ...state,
             postError,
+        }),
+        [SET_ORIGINAL_POST]: (state, { payload: post }) => ({
+            ...state,
+            title: post.title,
+            body: post.body,
+            tags: post.tags,
+            originalPostId: post._id,
         }),
     },
     initialState,
